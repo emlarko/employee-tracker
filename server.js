@@ -1,4 +1,4 @@
-const fs = require('fs');
+require('dotenv').config();
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 
@@ -6,7 +6,7 @@ const db = mysql.createConnection(
     {
       host: 'localhost',
       user: 'root',
-      password: 'waffle5296',
+      password: process.env.password,
       database: 'employee_db'
     },
     console.log(`Connected to the employee_db database.`)

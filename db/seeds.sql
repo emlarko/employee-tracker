@@ -6,7 +6,6 @@ VALUES ("Corporate and HR"),
     ("Accounting"),
     ("Product Oversight"),
     ("Warehouse");
-    
 
 INSERT INTO role (title, salary, department_id)
 VALUES ("Chief Financial Officer", 90000, 1),
@@ -32,7 +31,7 @@ VALUES ("David", "Wallace", 1, NULL),
     ("Jim", "Halpert", 2, 4),
     ("Stanley", "Hudson", 2, 4),
     ("Phyllis", "Lapin-Vance", 2, 4),
-    ("Pam", "Halpert", 3, 4),
+    ("Pam", "Beesly", 3, 4),
     ("Angela", "Martin", 4, 4),
     ("Kevin", "Malone", 5, 10),
     ("Oscar", "Martinez", 5, 10),
