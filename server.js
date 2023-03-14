@@ -23,7 +23,7 @@ const db = mysql.createConnection(
         {
             type: 'list',
             message: 'What would you like to do?',
-            choices: ["View All Departments", "View All Roles", "View All Employees", "Add An Employee", "Update Employee Role",  "Add Role", "Add Department"],
+            choices: ["View All Departments", "View All Roles", "View All Employees", "Add Department", "Add Role", "Add An Employee", "Update Employee Role"],
             name: 'firstInquiry' 
         }
     ]).then((response) => {
@@ -37,17 +37,17 @@ const db = mysql.createConnection(
             case 'View All Employees':
                 viewAllEmployees();
                 break;
+            case 'Add Department':
+                addDepartment();
+                break;
+            case 'Add Role':
+                addRole();
+                break;
             case 'Add An Employee':
                 addAnEmployee();
                 break;
             case 'Update Employee Role':
                 updateEmployeeRole();
-                break;
-            case 'Add Role':
-                addRole();
-                break;
-            case 'Add Department':
-                addDepartment();
                 break;
         }
     })
@@ -63,7 +63,7 @@ viewAllDepartments = () => {
 };
 
 viewAllRoles = () => {
-    const query = `SELECT role.id, role.title, role.salary, department.name AS department, department.id
+    const query = `SELECT role.id, role.title, role.salary, department.name AS department
     FROM role
     JOIN department ON role.department_id = department.id
     ORDER BY role.id ASC;`;
@@ -88,3 +88,62 @@ viewAllRoles = () => {
     })
 };
 
+addDepartment = () => {
+    inquirer.prompt([
+        {
+            type: 'input',
+            message: 'What is the name of the new Department?',
+            name: 'newDept'
+        }
+    ]).then((response) => {
+        const query = `INSERT INTO department SET ?`;
+        db.query(query, 
+        {
+           name: response.newDept,
+        },
+        (err, result) => {
+            if (err) throw err;
+            console.table(`\n ${response.newDept} successfully added to database! \n`);
+            init();
+        })
+    })
+};
+
+addRole = () => {
+    let query = `SELECT * FROM department;`
+    db.query(query, (err, results) => {
+        if (err) throw err;
+        let departments = results.map(department => ({name: department.name, value: department.id }));
+        inquirer.prompt([
+            {
+                type: 'input',
+                message: 'What is the title of the role you want to add?', 
+                name: 'title'
+            },
+            {
+                type: 'input',
+                message: 'What is the salary of the role you want to add?', 
+                name: 'salary' 
+            },
+            {
+                type: 'list',
+                message: 'Which department do you want to add the new role to?', 
+                choices: departments,
+                name: 'deptName'
+            },
+        ]).then((response) => {
+            let query = `INSERT INTO role SET ?`
+            db.query(query, 
+            {
+                title: response.title,
+                salary: response.salary,
+                department_id: response.deptName,
+            },
+            (err, res) => {
+                if (err) throw err;
+                console.log(`\n ${response.title} successfully added to database! \n`);
+                init();
+            })
+        })
+    })
+};
