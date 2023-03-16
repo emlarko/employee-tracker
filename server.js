@@ -181,7 +181,7 @@ addAnEmployee = () => {
         inquirer.prompt([
             {
                 type: 'input',
-                message: "What is the employee's first name", 
+                message: "What is the employee's first name?", 
                 name: 'firstName'
             },
             {
@@ -242,8 +242,6 @@ updateEmployeeRole = () => {
                 name: 'newRole'
             }
         ]).then((response) => {
-            console.log(response.employee);
-            console.log(response.newRole);
             let query = `UPDATE employee SET ? WHERE ?`;
             db.query(query,
                 [{
