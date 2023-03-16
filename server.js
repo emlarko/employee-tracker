@@ -23,7 +23,7 @@ const db = mysql.createConnection(
         {
             type: 'list',
             message: 'What would you like to do?',
-            choices: ["View All Departments", "View All Roles", "View All Employees", "Add Department", "Add Role", "Add An Employee", "Update Employee Role", "Update Employee's Manager", "View the total utilized budget of a department"],
+            choices: ["View All Departments", "View All Roles", "View All Employees", "Add Department", "Add Role", "Add An Employee", "Update Employee Role", "Update Employee Manager", "View Employees by Manager", "Delete Employee", "Delete Role", "Delete Department", "View the total utilized budget of a department"],
             name: 'firstInquiry' 
         }
     ]).then((response) => {
@@ -49,8 +49,20 @@ const db = mysql.createConnection(
             case 'Update Employee Role':
                 updateEmployeeRole();
                 break;
-            case "Update Employee's Manager":
+            case 'Update Employee Manager':
                 updateEmployeeManager();
+                break;
+            case 'View Employees by Manager':
+                viewByManager();
+                break;
+            case 'Delete Employee':
+                deleteEmployee();
+                break;
+            case 'Delete Role':
+                deleteRole();
+                break;
+            case 'Delete Department':
+                deleteDept();
                 break;
             case 'View the total utilized budget of a department':
                 viewDeptSalary();
@@ -281,6 +293,109 @@ updateEmployeeManager = () => {
     })
 };
 
+viewByManager = () => {
+    let query = `SELECT * FROM employee`;
+    db.query(query, (err, results) => {
+        if (err) throw err;
+        let managers = results.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id}));
+        inquirer.prompt([
+            {
+                type: 'list',
+                message: "Which Manager would you like to view the employee's of?", 
+                choices: managers,
+                name: 'manager'
+            },
+        ]).then((response) => {
+            let query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager
+            FROM employee
+            LEFT JOIN employee manager on manager.id = employee.manager_id
+            INNER JOIN role ON (role.id = employee.role_id)
+            INNER JOIN department ON (department.id = role.department_id)
+            WHERE employee.manager_id = ${response.manager} ORDER BY employee.id ASC;`;
+            db.query(query, (err, results) => {
+                if (err) throw err;
+                console.table(`\n`, results,`\n`);
+                init();
+            })
+        })
+    })
+};
+
+deleteEmployee = () => {
+    const query = `SELECT * FROM employee`;
+    db.query(query, (err, results) => {
+        let employees = results.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id}));
+        inquirer.prompt([
+        {
+            type: 'list',
+            message: "Which Employee would you like to delete?", 
+            choices: employees,
+            name: 'employee'
+        },
+        ]).then((response) => {
+            const query = `DELETE FROM employee WHERE ?`;
+            db.query(query,
+                {
+                    id: response.employee,
+                },(err, results) => {
+                    if (err) throw err;
+                    console.log(`\n The employee has been removed \n`);
+                    init();
+                })
+        })
+    })
+};
+
+deleteRole = () => {
+    const query = `SELECT * FROM role`;
+    db.query(query, (err, results) => {
+        let roles = results.map(role => ({name: role.title, value: role.id}));
+        inquirer.prompt([
+        {
+            type: 'list',
+            message: "Which Role would you like to delete?", 
+            choices: roles,
+            name: 'role'
+        },
+        ]).then((response) => {
+            const query = `DELETE FROM role WHERE ?`;
+            db.query(query,
+                {
+                    id: response.role,
+                },(err, results) => {
+                    if (err) throw err;
+                    console.log(`\n The Role has been removed \n`)
+                    init();
+                })
+        })
+    })
+};
+
+deleteDept = () => {
+    const query = `SELECT * FROM department`;
+    db.query(query, (err, results) => {
+        let departments = results.map(department => ({name: department.name, value: department.id}));
+        inquirer.prompt([
+        {
+            type: 'list',
+            message: "Which Department would you like to delete?", 
+            choices: departments,
+            name: 'department'
+        },
+        ]).then((response) => {
+            const query = `DELETE FROM department WHERE ?`;
+            db.query(query,
+                {
+                    id: response.department,
+                },(err, results) => {
+                    if (err) throw err;
+                    console.log(`\n The Department has been removed \n`)
+                    init();
+                })
+        })
+    })
+};
+
 viewDeptSalary = () => {
     const query = `SELECT * FROM department ORDER BY id ASC;`;
     db.query(query, (err, results) => {
@@ -302,6 +417,7 @@ viewDeptSalary = () => {
             if (err) throw err;
             console.log(`\n The total utilized budget of ${response.deptName} is \n`);
             console.table(results);
+            init();
             })
         })
     })
