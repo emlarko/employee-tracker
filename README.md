@@ -29,3 +29,5 @@ When choosing to add a Department, the user will be asked for the name of the ne
 The user is also able to update an Employee's Role and Manager, as well as delete an Employee, Role and Department. They will be presented with a list of values to do this.
 
 Another option is to view the total utilized budget of a department, which will present the combined salaries of all employees in that department.
+
+[SQL-Employee-Tracker.webm](https://user-images.githubusercontent.com/101362057/225648035-3a7f129e-2667-417c-b729-69e9accb9b76.webm)
