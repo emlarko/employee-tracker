@@ -23,7 +23,7 @@ const db = mysql.createConnection(
         {
             type: 'list',
             message: 'What would you like to do?',
-            choices: ["View All Departments", "View All Roles", "View All Employees", "Add Department", "Add Role", "Add An Employee", "Update Employee Role", "Update Employee Manager", "View Employees by Manager", "Delete Employee", "Delete Role", "Delete Department", "View the total utilized budget of a department"],
+            choices: ["View All Departments", "View All Roles", "View All Employees", "Add Department", "Add Role", "Add An Employee", "Update Employee Role", "Update Employee Manager", "View Employees by Manager", "Delete Employee", "Delete Role", "Delete Department", "View the total utilized budget of a department", "Exit"],
             name: 'firstInquiry' 
         }
     ]).then((response) => {
@@ -67,6 +67,9 @@ const db = mysql.createConnection(
             case 'View the total utilized budget of a department':
                 viewDeptSalary();
                 break;
+            case 'Exit':
+                db.end();
+                return;
         }
     })
   };
